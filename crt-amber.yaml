@@ -1,0 +1,211 @@
+# CRT Amber — Deep phosphor terminal theme
+# Drop-in to ~/.hermes/dashboard-themes/ — refresh dashboard to see it in the theme switcher.
+#
+# Models the look of a classic amber-phosphor CRT monitor (IBM 5151, DEC VT100).
+# Amber was the original monochrome monitor — warmer and easier on the eyes than
+# the green phosphor that came later. Distinguishes from the built-in Cyberpunk
+# theme (which uses neon green + Share Tech Mono) with:
+#   – Amber/orange phosphor glow (#ffb74d)
+#   – Horizontal scanlines across the full viewport
+#   – CRT vignette (radial shadow simulating curved screen edges)
+#   – Phosphor text glow via text-shadow on headings and active elements
+#   – Subtle screen flicker animation
+#   – Crisp monospace typography (IBM Plex Mono + VT323 display)
+
+name: crt-amber
+label: "CRT Amber"
+description: "Amber phosphor CRT terminal — warm glow, scanlines, and nostalgic flicker"
+
+# ─── palette ─────────────────────────────────────────────────────────────────
+palette:
+  # Very deep near-black with the faintest amber warmth — like a powered-off
+  # CRT screen in a dim room. Not pure #000; real CRTs never reached true black.
+  background: "#080804"
+  # Warm amber phosphor — the canonical IBM 5151 color. Slightly desaturated
+  # compared to pure orange so it feels like glowing phosphor, not a UI widget.
+  midground: "#ffb74d"
+  foreground:
+    hex: "#ffcc80"
+    alpha: 0.15         # Subtle top-layer amber accent
+  warmGlow: "rgba(255, 183, 77, 0.18)"
+  noiseOpacity: 1.2     # Gritty noise matches the CRT aesthetic
+
+# ─── typography ──────────────────────────────────────────────────────────────
+typography:
+  # IBM Plex Mono for body — clean, highly legible monospace. Falls back to
+  # VT323 for the pixel-terminal feel if Plex isn't available.
+  fontSans: '"IBM Plex Mono", "VT323", ui-monospace, "Courier New", monospace'
+  fontMono: '"IBM Plex Mono", ui-monospace, "Courier New", monospace'
+  # VT323 for display — a pixel-perfect 80s terminal font. Square, chunky,
+  # instantly recognizable as "old computer".
+  fontDisplay: '"VT323", "IBM Plex Mono", monospace'
+  fontUrl: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=VT323&display=swap"
+  baseSize: "14px"
+  lineHeight: "1.6"     # Slightly generous — CRTs needed breathing room
+  letterSpacing: "0.03em"  # Subtle spread mimics phosphor pixel bleed
+
+# ─── layout ──────────────────────────────────────────────────────────────────
+layout:
+  radius: "0"           # CRTs have sharp corners — no rounded UI
+  density: "compact"    # Tighter spacing fits more on screen
+
+# ─── component styles ────────────────────────────────────────────────────────
+componentStyles:
+  card:
+    # Subtle phosphor border glow + inset shadow for depth
+    boxShadow: "inset 0 0 0 1px rgba(255, 183, 77, 0.12), 0 0 12px -4px rgba(255, 183, 77, 0.18)"
+    background: "linear-gradient(180deg, rgba(12, 12, 6, 0.92), rgba(6, 6, 3, 0.96))"
+  header:
+    background: "linear-gradient(180deg, rgba(10, 10, 4, 0.96), rgba(6, 6, 2, 0.94))"
+  tab:
+    # Subtle trapezoid — hint of CRT menu chrome without being distracting
+    clipPath: "polygon(3px 0, calc(100% - 3px) 0, 100% 100%, 0 100%)"
+  badge:
+    textShadow: "0 0 4px rgba(255, 183, 77, 0.5)"
+
+# ─── color overrides ─────────────────────────────────────────────────────────
+colorOverrides:
+  success: "#a8ff60"      # Green — crisp against amber/black
+  warning: "#ffb74d"      # Matches midground
+  destructive: "#ff5f5f"  # Warm red
+  border: "rgba(255, 183, 77, 0.12)"
+  ring: "rgba(255, 183, 77, 0.35)"
+  mutedForeground: "rgba(255, 183, 77, 0.5)"
+
+# ─── custom CSS — CRT magic ──────────────────────────────────────────────────
+customCSS: |
+  /* ================================================================
+     CRT SCANLINES
+     Every-other-row darkening at 3px intervals. The classic CRT look.
+     Multiply blend mode darkens the underlying pixels without
+     washing out colors — accurate to how scanline overlays work on
+     real phosphor displays.
+     ================================================================ */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.07) 3px,
+      rgba(0, 0, 0, 0.07) 4px
+    );
+    mix-blend-mode: multiply;
+  }
+
+  /* ================================================================
+     CRT VIGNETTE — Screen curvature shadow
+     Real CRTs aren't flat; the glass curves away from the viewer at
+     the edges, creating a subtle darkening. This radial gradient
+     simulates that effect — brighter at center, darker at edges/corners.
+     ================================================================ */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 99;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 50%,
+      rgba(0, 0, 0, 0.1)  65%,
+      rgba(0, 0, 0, 0.25) 80%,
+      rgba(0, 0, 0, 0.45) 100%
+    );
+    mix-blend-mode: multiply;
+  }
+
+  /* ================================================================
+     PHOSPHOR TEXT GLOW
+     On real CRTs, bright areas bleed light into surrounding phosphor.
+     We simulate this with a warm amber text-shadow on headings and
+     the Hermes brand text (uses font-mondwest class).
+     ================================================================ */
+  h1, h2, h3, h4, h5, h6,
+  [class*="font-mondwest"] {
+    text-shadow:
+      0 0 4px  rgba(255, 183, 77, 0.25),
+      0 0 8px  rgba(255, 183, 77, 0.12),
+      0 0 14px rgba(255, 183, 77, 0.06);
+  }
+
+  /* Interactivity glow — links and buttons pulse when hovered */
+  a:hover,
+  button:hover,
+  [role="button"]:hover {
+    text-shadow: 0 0 8px rgba(255, 183, 77, 0.45);
+    transition: text-shadow 0.15s ease;
+  }
+
+  /* Active nav items glow brightest */
+  a[aria-current="page"] {
+    text-shadow:
+      0 0 6px  rgba(255, 183, 77, 0.4),
+      0 0 12px rgba(255, 183, 77, 0.2);
+  }
+
+  /* ================================================================
+     CRT FLICKER
+     Real CRTs aren't perfectly stable — the electron beam scanning
+     creates micro-flicker. This subtle animation on the html element
+     creates an imperceptible variation. Most people won't consciously
+     notice it, but removing it makes the theme feel "flat."
+     ================================================================ */
+  @keyframes crtFlicker {
+    0%     { opacity: 1; }
+    50%    { opacity: 1; }
+    99.4%  { opacity: 1; }
+    99.5%  { opacity: 0.985; }
+    99.6%  { opacity: 1; }
+    99.7%  { opacity: 0.99; }
+    99.8%  { opacity: 1; }
+  }
+
+  html {
+    animation: crtFlicker 3s infinite ease-in-out;
+  }
+
+  /* ================================================================
+     SCROLLBAR — Amber-tinted, thin
+     ================================================================ */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 183, 77, 0.18);
+    border: 1px solid rgba(255, 183, 77, 0.08);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 183, 77, 0.3);
+  }
+
+  /* ================================================================
+     AMBER CARET + SELECTION
+     ================================================================ */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    caret-color: #ffb74d;
+  }
+
+  ::selection {
+    background: rgba(255, 183, 77, 0.28);
+    color: #080804;
+    text-shadow: none;
+  }
+
+  /* ================================================================
+     BORDER GLOW — Thin amber line on key dividers
+     ================================================================ */
+  .border-border,
+  [class*="border-border"] {
+    border-color: rgba(255, 183, 77, 0.12);
+  }

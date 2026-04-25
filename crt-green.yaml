@@ -1,0 +1,187 @@
+# CRT Green — Classic green phosphor terminal theme
+# Drop-in to ~/.hermes/dashboard-themes/ — refresh dashboard to see it in the theme switcher.
+#
+# Models the look of a green-phosphor CRT monitor (classic IBM 5151 green,
+# Apple II monitor, early terminals). Green phosphor was the most common
+# monochrome display — cheaper and brighter than amber, iconic in hacker
+# culture (think The Matrix, Wargames, early UNIX terminals).
+#
+# Distinguishes from the built-in Cyberpunk theme (Share Tech Mono + bright
+# neon green) with:
+#   – Authentic phosphor green (#6aff7e — slightly desaturated, easy on eyes)
+#   – Full CRT effects: scanlines, vignette, flicker, phosphor glow
+#   – IBM Plex Mono + VT323 typography (not Share Tech Mono)
+#   – Subtle, aged phosphor feel — not the aggressive neon of Cyberpunk
+
+name: crt-green
+label: "CRT Green"
+description: "Green phosphor CRT terminal — classic hacker-green with scanlines and glow"
+
+# ─── palette ─────────────────────────────────────────────────────────────────
+palette:
+  # Very deep green-black — like a CRT in a dark room. Slight green tint
+  # so the background doesn't feel disconnected from the phosphor.
+  background: "#000500"
+  # Classic P1 green phosphor — vivid but not eye-searing. Slightly
+  # desaturated compared to pure #00ff00 so it reads as real phosphor.
+  midground: "#6aff7e"
+  foreground:
+    hex: "#9fffb0"
+    alpha: 0.12         # Subtle green top-layer glow
+  warmGlow: "rgba(106, 255, 126, 0.15)"
+  noiseOpacity: 1.2     # Heavy grain — CRTs were noisy
+
+# ─── typography ──────────────────────────────────────────────────────────────
+typography:
+  fontSans: '"IBM Plex Mono", "VT323", ui-monospace, "Courier New", monospace'
+  fontMono: '"IBM Plex Mono", ui-monospace, "Courier New", monospace'
+  fontDisplay: '"VT323", "IBM Plex Mono", monospace'
+  fontUrl: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=VT323&display=swap"
+  baseSize: "14px"
+  lineHeight: "1.6"
+  letterSpacing: "0.03em"
+
+# ─── layout ──────────────────────────────────────────────────────────────────
+layout:
+  radius: "0"
+  density: "compact"
+
+# ─── component styles ────────────────────────────────────────────────────────
+componentStyles:
+  card:
+    boxShadow: "inset 0 0 0 1px rgba(106, 255, 126, 0.12), 0 0 12px -4px rgba(106, 255, 126, 0.15)"
+    background: "linear-gradient(180deg, rgba(8, 12, 8, 0.92), rgba(4, 8, 4, 0.96))"
+  header:
+    background: "linear-gradient(180deg, rgba(6, 10, 6, 0.96), rgba(2, 6, 2, 0.94))"
+  tab:
+    clipPath: "polygon(3px 0, calc(100% - 3px) 0, 100% 100%, 0 100%)"
+  badge:
+    textShadow: "0 0 4px rgba(106, 255, 126, 0.5)"
+
+# ─── color overrides ─────────────────────────────────────────────────────────
+colorOverrides:
+  success: "#6aff7e"      # Matches midground
+  warning: "#ffd54f"      # Yellow — pops against green
+  destructive: "#ff6e6e"  # Red
+  border: "rgba(106, 255, 126, 0.12)"
+  ring: "rgba(106, 255, 126, 0.35)"
+  mutedForeground: "rgba(106, 255, 126, 0.5)"
+
+# ─── custom CSS — CRT magic ──────────────────────────────────────────────────
+customCSS: |
+  /* ================================================================
+     CRT SCANLINES — 3px pitch
+     ================================================================ */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 3px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+    mix-blend-mode: multiply;
+  }
+
+  /* ================================================================
+     CRT VIGNETTE — curved screen edge shadow
+     ================================================================ */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 99;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 50%,
+      rgba(0, 0, 0, 0.12) 65%,
+      rgba(0, 0, 0, 0.28) 80%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+    mix-blend-mode: multiply;
+  }
+
+  /* ================================================================
+     PHOSPHOR TEXT GLOW — Green variant
+     ================================================================ */
+  h1, h2, h3, h4, h5, h6,
+  [class*="font-mondwest"] {
+    text-shadow:
+      0 0 4px  rgba(106, 255, 126, 0.22),
+      0 0 8px  rgba(106, 255, 126, 0.1),
+      0 0 14px rgba(106, 255, 126, 0.05);
+  }
+
+  a:hover,
+  button:hover,
+  [role="button"]:hover {
+    text-shadow: 0 0 8px rgba(106, 255, 126, 0.4);
+    transition: text-shadow 0.15s ease;
+  }
+
+  a[aria-current="page"] {
+    text-shadow:
+      0 0 6px  rgba(106, 255, 126, 0.35),
+      0 0 12px rgba(106, 255, 126, 0.18);
+  }
+
+  /* ================================================================
+     CRT FLICKER
+     ================================================================ */
+  @keyframes crtFlicker {
+    0%     { opacity: 1; }
+    50%    { opacity: 1; }
+    99.4%  { opacity: 1; }
+    99.5%  { opacity: 0.985; }
+    99.6%  { opacity: 1; }
+    99.7%  { opacity: 0.99; }
+    99.8%  { opacity: 1; }
+  }
+
+  html {
+    animation: crtFlicker 3s infinite ease-in-out;
+  }
+
+  /* ================================================================
+     SCROLLBAR — Green-tinted
+     ================================================================ */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(106, 255, 126, 0.16);
+    border: 1px solid rgba(106, 255, 126, 0.06);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 255, 126, 0.28);
+  }
+
+  /* ================================================================
+     GREEN CARET + SELECTION
+     ================================================================ */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    caret-color: #6aff7e;
+  }
+
+  ::selection {
+    background: rgba(106, 255, 126, 0.25);
+    color: #000500;
+    text-shadow: none;
+  }
+
+  .border-border,
+  [class*="border-border"] {
+    border-color: rgba(106, 255, 126, 0.1);
+  }
